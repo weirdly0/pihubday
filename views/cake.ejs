@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cake Animation</title>
+    <style>
+      /* Reset styles */
+      *, *::before, *::after {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background-color: #eac285;
+        font-family: sans-serif;
+        overflow: hidden; /* Prevents scroll issues from floating emojis */
+      }
+      .container {
+        width: 400px;
+        height: 400px;
+        background-color: #eac284;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 50%;
+        border-radius: 8px;
+        box-shadow: 0 20px 45px rgba(120, 76, 10, 0.25);
+      }
+      .cake {
+        width: 100%;
+        position: absolute;
+        bottom: 60px;
+      }
+      .bottom-layer,
+      .top-layer,
+      .middle-layer {
+        height: 80px;
+        width: 240px;
+        position: relative;
+        margin: auto;
+        background-repeat: repeat;
+        background-size: 100% 100%, 60px 100px;
+        background-position: 28px 0;
+        background-image: 
+          linear-gradient(transparent 50px, #e3a953 50px, #e3a953 60px, transparent 60px),
+          radial-gradient(circle at 30px 5px, #713e16 30px, #eda63d 31px);
+      }
+      .middle-layer {
+        transform: scale(0.85);
+        top: 72px;
+        animation: rise-1 1s forwards;
+      }
+      @keyframes rise-1 {
+        100% {
+          top: 7px;
+        }
+      }
+      .top-layer {
+        transform: scale(0.7);
+        top: 144px;
+        animation: rise-2 1s 1s forwards;
+      }
+      @keyframes rise-2 {
+        100% {
+          top: 26px;
+        }
+      }
+
+      .watermark {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  color: rgba(0, 0, 0, 0.3); /* Light and subtle */
+  pointer-events: none; /* Prevent interaction */
+  white-space: nowrap; 
+}
+
+      .candle {
+        background: repeating-linear-gradient(
+          45deg,
+          #4b0082 0,
+          #4b0082 5px,
+          #8e44ad 5px,
+          #8e44ad 10px
+        );
+        height: 45px;
+        width: 15px;
+        position: absolute;
+        margin: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        animation: rise-3 1s 1.5s forwards;
+        cursor: pointer;
+      }
+      @keyframes rise-3 {
+        100% {
+          bottom: 202px;
+        }
+      }
+      .candle:after {
+        content: "";
+        position: absolute;
+        height: 16px;
+        width: 16px;
+        background-color: #ffee54;
+        border-radius: 0 50% 50% 50%;
+        transform: scale(0) rotate(45deg);
+        bottom: 50px;
+        left: -0.5px;
+        animation: flame 1.5s 2s forwards;
+      }
+      @keyframes flame {
+        100% {
+          transform: scale(1) rotate(45deg);
+        }
+      }
+      /* When candle is blown, hide the flame */
+      .candle.blown:after {
+        animation: none;
+        opacity: 0;
+        transform: scale(0) rotate(45deg);
+      }
+       /* Centered funky wish message */
+       #wishMessage {
+        position: absolute;
+        top: 25%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+        font-size: 100px;
+        font-family: "Pacifico", cursive;
+        color: #ff4081;
+        text-shadow: 3px 3px 5px rgba(0, 0, 0, 1);
+        text-align: center;
+        transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+      }
+      #wishMessage.visible {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      /* Music button styling */
+      #musicBtn {
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+  display: block;
+  position: absolute;
+  left: 50%;
+  
+  transform: translateX(-50%);
+  bottom: 100px;
+  background: #9b59b6;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+/* When the button becomes visible */
+#musicBtn.visible {
+  opacity: 1;
+}
+      /* Celebration emoji styling */
+      .emoji {
+        position: absolute;
+        font-size: 30px;
+        opacity: 1;
+        animation: floatUp 2s ease-out forwards;
+      }
+      @keyframes floatUp {
+        0% {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-150px) scale(1.5);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="watermark">Click on the candle to blow</div>
+
+      <div class="cake">
+        <div class="candle"></div>
+        <div class="top-layer"></div>
+        <div class="middle-layer"></div>
+        <div class="bottom-layer"></div>
+      </div>
+    </div>
+    <div id="wishMessage">Make a wish!</div>
+    <button id="musicBtn" onclick="window.location.href='/song'">Listen to Music</button>
+
+    <script>
+      document.querySelector('.candle').addEventListener('click', function () {
+  // Blow out the candle's flame
+  this.classList.add('blown');
+
+  // Pop the wish message from the center
+  const wishMessage = document.getElementById('wishMessage');
+  wishMessage.classList.add('visible');
+
+  // Show the "Listen to Music" button AFTER the wish text appears (delay by 1s)
+  setTimeout(function () {
+    document.getElementById('musicBtn').classList.add('visible');
+  }, 500); // Adjust delay if needed
+
+  // Generate more celebration emojis
+  for (let i = 0; i < 50; i++) {  
+    createCelebrationEmoji();
+  }
+});
+
+
+      function createCelebrationEmoji() {
+  const emojis = ["🎉", "🎈", "🎂", "🎊", "🎁", "✨", "🥰","🪅","🥳"];
+  const emoji = document.createElement("div");
+  emoji.classList.add("emoji");
+  emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+
+  // Set random position across the entire screen
+  const xPos = Math.random() * window.innerWidth;  // Full screen width
+  const yPos = Math.random() * window.innerHeight; // Full screen height
+
+  emoji.style.left = `${xPos}px`;
+  emoji.style.top = `${yPos}px`;
+
+  document.body.appendChild(emoji);
+
+  // Remove emoji after animation
+  setTimeout(() => emoji.remove(), 2000);
+}
+
+    </script>
+  </body>
+</html>
